@@ -430,7 +430,11 @@ def generate(
         if verbose:
             print(f"Added generated content to {result_path}")
     elif output_path is not None and output_path != "":
-        result_path = postprocessor.write_result(result, output_path)
+        result_path = postprocessor.write_result(
+            result,
+            output_path,
+            osu_file_name=f"{audio_path.rsplit('.', maxsplit=1)[0] + '.osu'}",
+        )
         if verbose:
             print(f"Generated beatmap saved to {result_path}")
 
