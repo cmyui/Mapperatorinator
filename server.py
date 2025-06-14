@@ -49,7 +49,7 @@ async def generate_map(
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
-        print(f"Generating AI map ({input_tempfile} -> {tempdir})")
+        print(f"Generating AI map ({input_tempfile} -> {tempdir}/)")
 
         # Stream output line by line
         assert current_process.stdout is not None
