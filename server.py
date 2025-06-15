@@ -6,7 +6,7 @@ from typing import AsyncIterator
 from fastapi import Depends, FastAPI, File, Response, UploadFile
 from fastapi.concurrency import asynccontextmanager
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from databases import Database
 from dotenv import load_dotenv
 
@@ -48,7 +48,7 @@ async def generate_map(
             values={"token": credentials.credentials},
         )
         if user is None:
-            return Response(
+            return JSONResponse(
                 {"error": "Unauthorized: Invalid or missing token."},
                 status_code=401,
             )
