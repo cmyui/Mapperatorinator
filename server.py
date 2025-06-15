@@ -8,6 +8,9 @@ from fastapi.concurrency import asynccontextmanager
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.responses import FileResponse
 from databases import Database
+from dotenv import load_dotenv
+
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
