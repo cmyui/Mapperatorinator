@@ -2,10 +2,24 @@ from asyncio import subprocess
 import os
 import sys
 import tempfile
-from fastapi import FastAPI, File, Response, UploadFile
+from typing import AsyncIterator
+from fastapi import Depends, FastAPI, File, Response, UploadFile
+from fastapi.concurrency import asynccontextmanager
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.responses import FileResponse
+from databases import Database
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Lifecycle event to connect to the database."""
+    await database.connect()
+    yield
+    await database.disconnect()
+
+app = FastAPI(lifespan=lifespan)
+security = HTTPBearer()
+
+database = Database(os.environ["DATABASE_URL"], min_size=1, max_size=10)
 
 
 def hydra_quote(value):
@@ -20,10 +34,22 @@ def hydra_quote(value):
 async def generate_map(
     difficulty: float,
     audio_file: UploadFile = File(...),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     assert audio_file.filename is not None
 
     try:
+        # Check if the user is authorized
+        user = await database.fetch_one(
+            "SELECT * FROM users WHERE token = :token",
+            values={"token": credentials.credentials},
+        )
+        if user is None:
+            return Response(
+                {"error": "Unauthorized: Invalid or missing token."},
+                status_code=401,
+            )
+
         tempdir = tempfile.mkdtemp(prefix="ai_osz_output_")
         input_tempfile = os.path.join(tempdir, audio_file.filename)
         with open(input_tempfile, "wb") as f:
