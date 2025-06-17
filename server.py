@@ -10,6 +10,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from databases import Database
 from dotenv import load_dotenv
 
+# avoid saturating the CPU with this process
+os.nice(19)
+
 load_dotenv()
 
 @asynccontextmanager
