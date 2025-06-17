@@ -123,4 +123,4 @@ async def generate_map(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("server:app", reload=True, port=9995)
+    uvicorn.run("server:app", port=9995)
